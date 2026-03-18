@@ -224,6 +224,7 @@ header {
       </div>
     </div>
 
+  /* ZOHO COMMENTED OUT
     <div class="setup-section">
       <h3>Z Zoho Calendar</h3>
       <div class="setup-field">
@@ -234,7 +235,12 @@ header {
         <label>Client Secret</label>
         <input id="s-z-secret" placeholder="abc123...">
       </div>
+      <div class="setup-field">
+        <label>Token Proxy URL <span style="color:var(--muted);font-weight:400">(Cloudflare Worker URL)</span></label>
+        <input id="s-z-proxy" placeholder="https://zoho-token-proxy.YOURNAME.workers.dev">
+      </div>
     </div>
+  */
 
     <button class="setup-save" onclick="saveSetup()">Save & Launch Dashboard</button>
     <div class="setup-note">🔒 Credentials are stored in localStorage on this device only and never sent anywhere except the official OAuth/API endpoints.</div>
@@ -247,7 +253,7 @@ header {
   <div id="clock">--:--</div>
   <div class="header-right">
     <button class="auth-btn disconnected" id="google-btn" onclick="connectGoogle()">G Google</button>
-    <button class="auth-btn disconnected" id="zoho-btn"   onclick="connectZoho()">Z Zoho</button>
+    <!-- <button class="auth-btn disconnected" id="zoho-btn" onclick="connectZoho()">Z Zoho</button> -->
     <button class="icon-btn" onclick="goFullscreen()">⛶ Fullscreen</button>
     <button class="icon-btn" onclick="openSetup()">⚙ Setup</button>
   </div>
@@ -289,7 +295,7 @@ header {
     </div>
     <div class="legend">
       <span><span class="dot" style="background:var(--green)"></span> Google</span>
-      <span><span class="dot" style="background:var(--purple)"></span> Zoho</span>
+      <!-- <span><span class="dot" style="background:var(--purple)"></span> Zoho</span> -->
       <span><span class="dot" style="background:var(--orange)"></span> Tasks</span>
     </div>
     <div id="week-scroll"><div id="week-grid"></div></div>
@@ -320,6 +326,7 @@ function loadConfig() {
     zoho: {
       clientId:     localStorage.getItem('cfg_z_id')     || '',
       clientSecret: localStorage.getItem('cfg_z_secret') || '',
+      proxyUrl:     localStorage.getItem('cfg_z_proxy')  || '',
     },
     todosCalendar: 'google',
     weekStartHour: 7,
@@ -337,6 +344,7 @@ function openSetup() {
   document.getElementById('s-g-secret').value = c.google.clientSecret;
   document.getElementById('s-z-id').value     = c.zoho.clientId;
   document.getElementById('s-z-secret').value = c.zoho.clientSecret;
+  document.getElementById('s-z-proxy').value  = c.zoho.proxyUrl;
   document.getElementById('setup-screen').classList.add('active');
   // Auto-detect location if fields are empty
   if (!c.lat && navigator.geolocation) {
@@ -359,6 +367,7 @@ function saveSetup() {
   localStorage.setItem('cfg_g_secret', document.getElementById('s-g-secret').value.trim());
   localStorage.setItem('cfg_z_id',     document.getElementById('s-z-id').value.trim());
   localStorage.setItem('cfg_z_secret', document.getElementById('s-z-secret').value.trim());
+  localStorage.setItem('cfg_z_proxy',  document.getElementById('s-z-proxy').value.trim());
   document.getElementById('setup-screen').classList.remove('active');
   // Reload so all config is fresh
   location.reload();
@@ -477,7 +486,9 @@ async function connectZoho() {
   location.href = `https://accounts.zoho.com/oauth/v2/auth?${p}`;
 }
 async function exchangeZoho(code) {
-  const r = await fetch('https://accounts.zoho.com/oauth/v2/token', {
+  const proxyUrl = CONFIG.zoho.proxyUrl;
+  if (!proxyUrl) { console.warn('Zoho proxy URL not set in Setup'); return; }
+  const r = await fetch(proxyUrl, {
     method: 'POST',
     headers: {'Content-Type':'application/x-www-form-urlencoded'},
     body: new URLSearchParams({
@@ -507,18 +518,45 @@ async function fetchGoogleEvents() {
   if (!tokens.google?.access_token) return [];
   const s = new Date(); s.setDate(s.getDate()-35);
   const e = new Date(); e.setDate(e.getDate()+60);
-  const r = await fetch(
-    `https://www.googleapis.com/calendar/v3/calendars/primary/events?timeMin=${s.toISOString()}&timeMax=${e.toISOString()}&singleEvents=true&orderBy=startTime&maxResults=250`,
-    { headers: { Authorization:`Bearer ${tokens.google.access_token}` } }
+  const headers = { Authorization:`Bearer ${tokens.google.access_token}` };
+
+  // Step 1: get all calendars the user has
+  const calListR = await fetch(
+    'https://www.googleapis.com/calendar/v3/users/me/calendarList?maxResults=50',
+    { headers }
   );
-  if (!r.ok) return [];
-  const d = await r.json();
-  return (d.items||[]).map(ev=>({
-    title: ev.summary||'(No title)',
-    start: new Date(ev.start.dateTime??ev.start.date),
-    end:   new Date(ev.end.dateTime??ev.end.date),
-    allDay: !ev.start.dateTime, source: 'google',
-  }));
+  if (!calListR.ok) {
+    console.error('Google calendarList failed:', calListR.status, await calListR.text());
+    return [];
+  }
+  const calList = await calListR.json();
+  const calIds  = (calList.items||[]).map(c => c.id);
+  console.log('Google calendars found:', calIds);
+
+  // Step 2: fetch events from every calendar in parallel
+  const results = await Promise.allSettled(calIds.map(calId =>
+    fetch(
+      `https://www.googleapis.com/calendar/v3/calendars/${encodeURIComponent(calId)}/events?timeMin=${s.toISOString()}&timeMax=${e.toISOString()}&singleEvents=true&orderBy=startTime&maxResults=250`,
+      { headers }
+    ).then(r => {
+      if (!r.ok) { console.warn(`Calendar ${calId} fetch failed:`, r.status); return {items:[]}; }
+      return r.json();
+    })
+  ));
+
+  const evts = [];
+  results.forEach(res => {
+    if (res.status === 'fulfilled') {
+      (res.value.items||[]).forEach(ev => evts.push({
+        title:  ev.summary||'(No title)',
+        start:  new Date(ev.start.dateTime??ev.start.date),
+        end:    new Date(ev.end.dateTime??ev.end.date),
+        allDay: !ev.start.dateTime, source: 'google',
+      }));
+    }
+  });
+  console.log('Google events loaded:', evts.length);
+  return evts;
 }
 async function fetchZohoEvents() {
   if (!tokens.zoho?.access_token) return [];
@@ -547,11 +585,9 @@ async function fetchZohoEvents() {
   return evts;
 }
 async function fetchAllEvents() {
-  const [goog, zoho] = await Promise.allSettled([fetchGoogleEvents(), fetchZohoEvents()]);
-  allEvents = [
-    ...(goog.status==='fulfilled'?goog.value:[]),
-    ...(zoho.status==='fulfilled'?zoho.value:[]),
-  ];
+  const [goog] = await Promise.allSettled([fetchGoogleEvents()]);
+  allEvents = [...(goog.status==='fulfilled'?goog.value:[])];
+  // ZOHO COMMENTED OUT: const zoho = await fetchZohoEvents();
   renderWeekly(); renderMiniCal();
 }
 setInterval(fetchAllEvents, 10*60*1000);
