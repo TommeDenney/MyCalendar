@@ -1,0 +1,714 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dashboard</title>
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --bg:       #0d1117;
+  --surface:  #161b22;
+  --surface2: #21262d;
+  --border:   #30363d;
+  --text:     #e6edf3;
+  --muted:    #8b949e;
+  --accent:   #58a6ff;
+  --green:    #3fb950;
+  --orange:   #d29922;
+  --purple:   #bc8cff;
+  --red:      #f85149;
+}
+
+/* ── Setup Screen ── */
+#setup-screen {
+  display: none;
+  position: fixed; inset: 0; z-index: 999;
+  background: var(--bg);
+  align-items: center; justify-content: center;
+}
+#setup-screen.active { display: flex; }
+.setup-box {
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: 14px; padding: 40px; width: 480px; max-width: 95vw;
+}
+.setup-box h2 { font-size: 1.3rem; margin-bottom: 6px; color: var(--text); }
+.setup-box p  { font-size: 0.82rem; color: var(--muted); margin-bottom: 28px; line-height: 1.5; }
+.setup-section { margin-bottom: 22px; }
+.setup-section h3 { font-size: 0.75rem; font-weight: 700; text-transform: uppercase;
+  letter-spacing: 1.2px; color: var(--muted); margin-bottom: 10px; }
+.setup-field { margin-bottom: 10px; }
+.setup-field label { display: block; font-size: 0.78rem; color: var(--muted); margin-bottom: 4px; }
+.setup-field input {
+  width: 100%; background: var(--surface2); border: 1px solid var(--border);
+  color: var(--text); border-radius: 8px; padding: 9px 12px;
+  font-size: 0.82rem; outline: none; font-family: monospace;
+}
+.setup-field input:focus { border-color: var(--accent); }
+.setup-save {
+  width: 100%; background: var(--accent); border: none; color: #000;
+  border-radius: 8px; padding: 11px; font-size: 0.9rem;
+  font-weight: 700; cursor: pointer; margin-top: 6px;
+}
+.setup-save:hover { opacity: 0.9; }
+.setup-note { font-size: 0.72rem; color: var(--muted); margin-top: 14px; text-align: center; }
+
+/* ── Dashboard ── */
+body {
+  background: var(--bg); color: var(--text);
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  height: 100vh; overflow: hidden;
+  display: grid;
+  grid-template-rows: 72px 1fr;
+  grid-template-columns: 300px 1fr;
+  gap: 8px; padding: 8px;
+}
+header {
+  grid-column: 1 / -1;
+  display: flex; align-items: center; justify-content: space-between;
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: 10px; padding: 0 20px;
+}
+#date-display { font-size: 1rem; color: var(--muted); }
+#clock { font-size: 2.2rem; font-weight: 700; color: var(--accent); letter-spacing: 2px; }
+.header-right { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; justify-content: flex-end; }
+.auth-btn {
+  padding: 5px 12px; border-radius: 20px; border: 1px solid var(--border);
+  background: var(--surface2); color: var(--muted);
+  cursor: pointer; font-size: 0.75rem; font-weight: 600; transition: all 0.2s;
+}
+.auth-btn.connected    { border-color: var(--green); color: var(--green); }
+.auth-btn.disconnected { border-color: var(--border); color: var(--muted); }
+.icon-btn {
+  padding: 5px 12px; border-radius: 20px; border: 1px solid var(--border);
+  background: var(--surface2); color: var(--text);
+  cursor: pointer; font-size: 0.75rem; font-weight: 600;
+}
+.icon-btn:hover { background: var(--accent); color: #000; border-color: var(--accent); }
+.card {
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: 10px; padding: 14px; overflow: hidden;
+}
+.card-label {
+  font-size: 0.65rem; font-weight: 700; text-transform: uppercase;
+  letter-spacing: 1.5px; color: var(--muted); margin-bottom: 10px;
+}
+.left-panel  { display: flex; flex-direction: column; gap: 8px; overflow: hidden; }
+.right-panel { display: flex; flex-direction: column; gap: 8px; overflow: hidden; }
+
+/* Weather */
+#wx-today { display: flex; align-items: center; gap: 14px; margin-bottom: 10px; }
+#wx-icon  { font-size: 2.8rem; line-height: 1; }
+#wx-temp  { font-size: 2.2rem; font-weight: 800; }
+#wx-desc  { font-size: 0.8rem; color: var(--muted); text-transform: capitalize; }
+#wx-meta  { font-size: 0.75rem; color: var(--muted); margin-top: 2px; }
+#wx-forecast { display: flex; gap: 5px; }
+.fc-day {
+  flex: 1; text-align: center; background: var(--surface2);
+  border-radius: 8px; padding: 6px 3px; font-size: 0.72rem;
+}
+.fc-day .fc-name { color: var(--muted); font-size: 0.65rem; margin-bottom: 2px; }
+.fc-day .fc-hi   { font-weight: 700; }
+.fc-day .fc-lo   { color: var(--muted); font-size: 0.65rem; }
+
+/* Mini Calendar */
+#mini-cal-card { flex: 1; display: flex; flex-direction: column; }
+.cal-nav { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+.cal-nav-btn {
+  background: var(--surface2); border: 1px solid var(--border);
+  color: var(--text); border-radius: 5px; padding: 2px 8px; cursor: pointer; font-size: 0.85rem;
+}
+#month-label { font-size: 0.85rem; font-weight: 600; }
+#mini-cal table { width: 100%; border-collapse: collapse; }
+#mini-cal th { color: var(--muted); font-size: 0.65rem; text-align: center; padding: 3px 0; font-weight: 600; }
+#mini-cal td { text-align: center; font-size: 0.78rem; padding: 3px 1px; border-radius: 50%; cursor: default; }
+#mini-cal td.today       { background: var(--accent); color: #000 !important; font-weight: 800; }
+#mini-cal td.has-event   { color: var(--accent); font-weight: 600; }
+#mini-cal td.other-month { color: var(--border); }
+#mini-cal td.in-week     { background: var(--surface2); border-radius: 3px; }
+
+/* Weekly */
+#weekly-card { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
+.week-nav { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+.week-nav-btn {
+  background: var(--surface2); border: 1px solid var(--border);
+  color: var(--text); border-radius: 6px; padding: 3px 12px; cursor: pointer; font-size: 0.78rem;
+}
+.week-today-btn {
+  background: var(--accent); border: none; color: #000;
+  border-radius: 6px; padding: 3px 12px; cursor: pointer; font-size: 0.78rem; font-weight: 700;
+}
+#week-scroll { flex: 1; overflow-y: auto; overflow-x: hidden; }
+#week-scroll::-webkit-scrollbar { width: 4px; }
+#week-scroll::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+#week-grid { display: grid; grid-template-columns: 36px repeat(7,1fr); gap: 2px; }
+.wg-header {
+  text-align: center; padding: 5px 2px;
+  background: var(--surface2); border-radius: 6px; font-size: 0.72rem;
+}
+.wg-header .wg-day-num { font-size: 1.05rem; font-weight: 700; display: block; line-height: 1.2; }
+.wg-header.today-col, .wg-header.today-col .wg-day-num { color: var(--accent); }
+.wg-time { font-size: 0.58rem; color: var(--muted); text-align: right; padding-right: 4px; padding-top: 3px; }
+.wg-cell { background: var(--surface2); border-radius: 3px; min-height: 28px; overflow: hidden; }
+.wg-cell.now-row { border-top: 2px solid var(--accent); }
+.wg-event {
+  font-size: 0.6rem; font-weight: 700; padding: 1px 4px; border-radius: 2px; margin: 1px;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: #000;
+}
+
+/* Todos */
+#todo-card { flex: 0 0 auto; }
+#todo-list { list-style: none; max-height: 130px; overflow-y: auto; margin-bottom: 8px; }
+#todo-list::-webkit-scrollbar { width: 3px; }
+#todo-list::-webkit-scrollbar-thumb { background: var(--border); }
+#todo-list li {
+  display: flex; align-items: center; gap: 8px;
+  padding: 5px 0; border-bottom: 1px solid var(--border); font-size: 0.83rem;
+}
+#todo-list li:last-child { border-bottom: none; }
+#todo-list li.done span.todo-text { text-decoration: line-through; color: var(--muted); }
+#todo-list li input[type="checkbox"] { accent-color: var(--orange); flex-shrink: 0; }
+.todo-day-badge {
+  margin-left: auto; flex-shrink: 0; font-size: 0.65rem; color: var(--muted);
+  background: var(--surface2); border-radius: 4px; padding: 1px 5px;
+}
+#todo-form { display: flex; gap: 6px; }
+#todo-input {
+  flex: 1; background: var(--surface2); border: 1px solid var(--border);
+  color: var(--text); border-radius: 7px; padding: 7px 10px; font-size: 0.82rem; outline: none;
+}
+#todo-input:focus { border-color: var(--orange); }
+#todo-add {
+  background: var(--orange); border: none; color: #000;
+  border-radius: 7px; padding: 7px 14px; font-weight: 700; cursor: pointer; font-size: 0.82rem;
+}
+.legend { display: flex; gap: 10px; font-size: 0.65rem; color: var(--muted); margin-bottom: 6px; }
+.legend span { display: flex; align-items: center; gap: 3px; }
+.dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; }
+</style>
+</head>
+<body>
+
+<!-- ── Setup Screen ────────────────────────────────── -->
+<div id="setup-screen">
+  <div class="setup-box">
+    <h2>📅 Dashboard Setup</h2>
+    <p>Enter your credentials below. They're saved only in <strong>your browser</strong> — nothing is stored in the code or on GitHub.</p>
+
+    <div class="setup-section">
+      <h3>🌤 OpenWeatherMap</h3>
+      <div class="setup-field">
+        <label>API Key</label>
+        <input id="s-wx-key" placeholder="e.g. 724712c78c2fc2589c0bd342ddbc239c">
+      </div>
+      <div class="setup-field">
+        <label>Latitude</label>
+        <input id="s-lat" placeholder="Detecting…">
+      </div>
+      <div class="setup-field">
+        <label>Longitude</label>
+        <input id="s-lon" placeholder="Detecting…">
+      </div>
+      <div id="geo-status" style="font-size:0.72rem;color:var(--muted);margin-top:-4px"></div>
+    </div>
+
+    <div class="setup-section">
+      <h3>G Google Calendar</h3>
+      <div class="setup-field">
+        <label>Client ID</label>
+        <input id="s-g-id" placeholder="....apps.googleusercontent.com">
+      </div>
+      <div class="setup-field">
+        <label>Client Secret</label>
+        <input id="s-g-secret" placeholder="GOCSPX-...">
+      </div>
+    </div>
+
+    <div class="setup-section">
+      <h3>Z Zoho Calendar</h3>
+      <div class="setup-field">
+        <label>Client ID</label>
+        <input id="s-z-id" placeholder="1000.XXXX...">
+      </div>
+      <div class="setup-field">
+        <label>Client Secret</label>
+        <input id="s-z-secret" placeholder="abc123...">
+      </div>
+    </div>
+
+    <button class="setup-save" onclick="saveSetup()">Save & Launch Dashboard</button>
+    <div class="setup-note">🔒 Credentials are stored in localStorage on this device only and never sent anywhere except the official OAuth/API endpoints.</div>
+  </div>
+</div>
+
+<!-- ── Dashboard ───────────────────────────────────── -->
+<header>
+  <div><div id="date-display">Loading...</div></div>
+  <div id="clock">--:--</div>
+  <div class="header-right">
+    <button class="auth-btn disconnected" id="google-btn" onclick="connectGoogle()">G Google</button>
+    <button class="auth-btn disconnected" id="zoho-btn"   onclick="connectZoho()">Z Zoho</button>
+    <button class="icon-btn" onclick="goFullscreen()">⛶ Fullscreen</button>
+    <button class="icon-btn" onclick="openSetup()">⚙ Setup</button>
+  </div>
+</header>
+
+<div class="left-panel">
+  <div class="card">
+    <div class="card-label">Weather</div>
+    <div id="wx-today">
+      <div id="wx-icon">🌡</div>
+      <div>
+        <div id="wx-temp">--°F</div>
+        <div id="wx-desc">Enter API key in Setup</div>
+        <div id="wx-meta"></div>
+      </div>
+    </div>
+    <div id="wx-forecast"></div>
+  </div>
+
+  <div class="card" id="mini-cal-card">
+    <div class="cal-nav">
+      <button class="cal-nav-btn" onclick="changeMonth(-1)">‹</button>
+      <div id="month-label"></div>
+      <button class="cal-nav-btn" onclick="changeMonth(1)">›</button>
+    </div>
+    <div id="mini-cal"></div>
+  </div>
+</div>
+
+<div class="right-panel">
+  <div class="card" id="weekly-card">
+    <div class="week-nav">
+      <div class="card-label" style="margin:0">Weekly Schedule</div>
+      <div style="display:flex;gap:6px">
+        <button class="week-nav-btn" onclick="changeWeek(-1)">‹ Prev</button>
+        <button class="week-today-btn" onclick="changeWeek(0)">Today</button>
+        <button class="week-nav-btn" onclick="changeWeek(1)">Next ›</button>
+      </div>
+    </div>
+    <div class="legend">
+      <span><span class="dot" style="background:var(--green)"></span> Google</span>
+      <span><span class="dot" style="background:var(--purple)"></span> Zoho</span>
+      <span><span class="dot" style="background:var(--orange)"></span> Tasks</span>
+    </div>
+    <div id="week-scroll"><div id="week-grid"></div></div>
+  </div>
+
+  <div class="card" id="todo-card">
+    <div class="card-label">This Week's Tasks</div>
+    <ul id="todo-list"></ul>
+    <div id="todo-form">
+      <input id="todo-input" placeholder="Add a task for this week… (Enter to save)"
+             onkeydown="if(event.key==='Enter') addTodo()">
+      <button id="todo-add" onclick="addTodo()">+ Add</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ── Load config from localStorage (no secrets in code) ──
+function loadConfig() {
+  return {
+    weatherApiKey: localStorage.getItem('cfg_wx_key')    || '',
+    lat:  parseFloat(localStorage.getItem('cfg_lat'))    || 0,
+    lon:  parseFloat(localStorage.getItem('cfg_lon'))    || 0,
+    google: {
+      clientId:     localStorage.getItem('cfg_g_id')     || '',
+      clientSecret: localStorage.getItem('cfg_g_secret') || '',
+    },
+    zoho: {
+      clientId:     localStorage.getItem('cfg_z_id')     || '',
+      clientSecret: localStorage.getItem('cfg_z_secret') || '',
+    },
+    todosCalendar: 'google',
+    weekStartHour: 7,
+    weekEndHour:   22,
+  };
+}
+
+// ── Setup UI ────────────────────────────────────────────
+function openSetup() {
+  const c = loadConfig();
+  document.getElementById('s-wx-key').value   = c.weatherApiKey;
+  document.getElementById('s-lat').value      = c.lat || '';
+  document.getElementById('s-lon').value      = c.lon || '';
+  document.getElementById('s-g-id').value     = c.google.clientId;
+  document.getElementById('s-g-secret').value = c.google.clientSecret;
+  document.getElementById('s-z-id').value     = c.zoho.clientId;
+  document.getElementById('s-z-secret').value = c.zoho.clientSecret;
+  document.getElementById('setup-screen').classList.add('active');
+  // Auto-detect location if fields are empty
+  if (!c.lat && navigator.geolocation) {
+    document.getElementById('geo-status').textContent = '📍 Detecting your location…';
+    navigator.geolocation.getCurrentPosition(
+      pos => {
+        document.getElementById('s-lat').value = pos.coords.latitude.toFixed(4);
+        document.getElementById('s-lon').value = pos.coords.longitude.toFixed(4);
+        document.getElementById('geo-status').textContent = '✅ Location detected';
+      },
+      () => { document.getElementById('geo-status').textContent = '⚠️ Could not detect location — enter manually'; }
+    );
+  }
+}
+function saveSetup() {
+  localStorage.setItem('cfg_wx_key',   document.getElementById('s-wx-key').value.trim());
+  localStorage.setItem('cfg_lat',      document.getElementById('s-lat').value.trim());
+  localStorage.setItem('cfg_lon',      document.getElementById('s-lon').value.trim());
+  localStorage.setItem('cfg_g_id',     document.getElementById('s-g-id').value.trim());
+  localStorage.setItem('cfg_g_secret', document.getElementById('s-g-secret').value.trim());
+  localStorage.setItem('cfg_z_id',     document.getElementById('s-z-id').value.trim());
+  localStorage.setItem('cfg_z_secret', document.getElementById('s-z-secret').value.trim());
+  document.getElementById('setup-screen').classList.remove('active');
+  // Reload so all config is fresh
+  location.reload();
+}
+
+// ── Constants ────────────────────────────────────────────
+const REDIRECT = window.location.origin + window.location.pathname;
+const DAYS   = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+const MONTHS = ['January','February','March','April','May','June',
+                'July','August','September','October','November','December'];
+const WX_ICONS = {
+  '01d':'☀️','01n':'🌙','02d':'🌤','02n':'🌤','03d':'⛅','03n':'⛅',
+  '04d':'☁️','04n':'☁️','09d':'🌧','09n':'🌧','10d':'🌦','10n':'🌦',
+  '11d':'⛈','11n':'⛈','13d':'❄️','13n':'❄️','50d':'🌫','50n':'🌫',
+};
+
+let CONFIG      = loadConfig();
+let monthOffset = 0;
+let weekOffset  = 0;
+let allEvents   = [];
+let todos       = JSON.parse(localStorage.getItem('dash_todos') || '[]');
+let tokens      = {
+  google: JSON.parse(localStorage.getItem('tok_goog') || 'null'),
+  zoho:   JSON.parse(localStorage.getItem('tok_zoho') || 'null'),
+};
+
+// ── Utils ────────────────────────────────────────────────
+function randStr(len) {
+  const a = new Uint8Array(Math.ceil(len*3/4));
+  crypto.getRandomValues(a);
+  return btoa(String.fromCharCode(...a)).replace(/[^a-zA-Z0-9]/g,'').slice(0,len);
+}
+async function pkceChallenge(v) {
+  const hash = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(v));
+  return btoa(String.fromCharCode(...new Uint8Array(hash)))
+    .replace(/\+/g,'-').replace(/\//g,'_').replace(/=/g,'');
+}
+function startOfWeek(offset) {
+  const d = new Date(), dow = d.getDay();
+  const mon = new Date(d);
+  mon.setDate(d.getDate()-(dow===0?6:dow-1)+offset*7);
+  mon.setHours(0,0,0,0); return mon;
+}
+function sameDay(a,b) { return a.toDateString()===b.toDateString(); }
+function fmt12(h) { if(h===0)return'12a'; if(h===12)return'12p'; return h>12?`${h-12}p`:`${h}a`; }
+
+// ── Clock ─────────────────────────────────────────────────
+function tick() {
+  const n = new Date();
+  document.getElementById('clock').textContent =
+    n.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'});
+  document.getElementById('date-display').textContent =
+    n.toLocaleDateString([],{weekday:'long',month:'long',day:'numeric',year:'numeric'});
+}
+setInterval(tick,1000); tick();
+
+function goFullscreen() { document.documentElement.requestFullscreen?.(); }
+
+// ── Auth UI ───────────────────────────────────────────────
+function updateAuthUI() {
+  const set = (id, ok) => {
+    const btn = document.getElementById(id);
+    btn.className = 'auth-btn '+(ok?'connected':'disconnected');
+  };
+  set('google-btn', !!tokens.google);
+  set('zoho-btn',   !!tokens.zoho);
+}
+
+// ── Google OAuth ──────────────────────────────────────────
+async function connectGoogle() {
+  if (!CONFIG.google.clientId) { alert('Add your Google credentials in ⚙ Setup first.'); return; }
+  if (tokens.google) {
+    tokens.google = null; localStorage.removeItem('tok_goog');
+    updateAuthUI(); allEvents = allEvents.filter(e=>e.source!=='google');
+    renderWeekly(); renderMiniCal(); return;
+  }
+  const v = randStr(64), c = await pkceChallenge(v);
+  sessionStorage.setItem('pkce_goog', v);
+  const p = new URLSearchParams({
+    client_id: CONFIG.google.clientId, response_type: 'code', redirect_uri: REDIRECT,
+    scope: 'https://www.googleapis.com/auth/calendar',
+    code_challenge: c, code_challenge_method: 'S256', access_type: 'offline', state: 'goog',
+  });
+  location.href = `https://accounts.google.com/o/oauth2/v2/auth?${p}`;
+}
+async function exchangeGoogle(code) {
+  const r = await fetch('https://oauth2.googleapis.com/token', {
+    method: 'POST',
+    headers: {'Content-Type':'application/x-www-form-urlencoded'},
+    body: new URLSearchParams({
+      client_id: CONFIG.google.clientId, client_secret: CONFIG.google.clientSecret,
+      grant_type: 'authorization_code', code, redirect_uri: REDIRECT,
+      code_verifier: sessionStorage.getItem('pkce_goog'),
+    })
+  });
+  const d = await r.json();
+  if (d.access_token) { tokens.google = d; localStorage.setItem('tok_goog', JSON.stringify(d)); }
+  else console.error('Google token exchange failed', d);
+}
+
+// ── Zoho OAuth ────────────────────────────────────────────
+async function connectZoho() {
+  if (!CONFIG.zoho.clientId) { alert('Add your Zoho credentials in ⚙ Setup first.'); return; }
+  if (tokens.zoho) {
+    tokens.zoho = null; localStorage.removeItem('tok_zoho');
+    updateAuthUI(); allEvents = allEvents.filter(e=>e.source!=='zoho');
+    renderWeekly(); renderMiniCal(); return;
+  }
+  const v = randStr(64), c = await pkceChallenge(v);
+  sessionStorage.setItem('pkce_zoho', v);
+  const p = new URLSearchParams({
+    client_id: CONFIG.zoho.clientId, response_type: 'code', redirect_uri: REDIRECT,
+    scope: 'ZohoCalendar.calendar.ALL', code_challenge: c,
+    code_challenge_method: 'S256', access_type: 'offline', state: 'zoho',
+  });
+  location.href = `https://accounts.zoho.com/oauth/v2/auth?${p}`;
+}
+async function exchangeZoho(code) {
+  const r = await fetch('https://accounts.zoho.com/oauth/v2/token', {
+    method: 'POST',
+    headers: {'Content-Type':'application/x-www-form-urlencoded'},
+    body: new URLSearchParams({
+      client_id: CONFIG.zoho.clientId, client_secret: CONFIG.zoho.clientSecret,
+      grant_type: 'authorization_code', code, redirect_uri: REDIRECT,
+      code_verifier: sessionStorage.getItem('pkce_zoho'),
+    })
+  });
+  const d = await r.json();
+  if (d.access_token) { tokens.zoho = d; localStorage.setItem('tok_zoho', JSON.stringify(d)); }
+  else console.error('Zoho token exchange failed', d);
+}
+
+// ── OAuth Callback Handler ────────────────────────────────
+async function handleCallback() {
+  const p = new URLSearchParams(location.search);
+  const code = p.get('code'), state = p.get('state');
+  if (!code) return;
+  history.replaceState({}, '', location.pathname);
+  if      (state==='goog') await exchangeGoogle(code);
+  else if (state==='zoho') await exchangeZoho(code);
+  updateAuthUI(); fetchAllEvents();
+}
+
+// ── Fetch Events ──────────────────────────────────────────
+async function fetchGoogleEvents() {
+  if (!tokens.google?.access_token) return [];
+  const s = new Date(); s.setDate(s.getDate()-35);
+  const e = new Date(); e.setDate(e.getDate()+60);
+  const r = await fetch(
+    `https://www.googleapis.com/calendar/v3/calendars/primary/events?timeMin=${s.toISOString()}&timeMax=${e.toISOString()}&singleEvents=true&orderBy=startTime&maxResults=250`,
+    { headers: { Authorization:`Bearer ${tokens.google.access_token}` } }
+  );
+  if (!r.ok) return [];
+  const d = await r.json();
+  return (d.items||[]).map(ev=>({
+    title: ev.summary||'(No title)',
+    start: new Date(ev.start.dateTime??ev.start.date),
+    end:   new Date(ev.end.dateTime??ev.end.date),
+    allDay: !ev.start.dateTime, source: 'google',
+  }));
+}
+async function fetchZohoEvents() {
+  if (!tokens.zoho?.access_token) return [];
+  const calR = await fetch('https://calendar.zoho.com/api/v1/calendars',
+    { headers: { Authorization:`Zoho-oauthtoken ${tokens.zoho.access_token}` } });
+  if (!calR.ok) return [];
+  const { calendars=[] } = await calR.json();
+  const s = new Date(); s.setDate(s.getDate()-35);
+  const e = new Date(); e.setDate(e.getDate()+60);
+  const fmt = d => d.toISOString().slice(0,10).replace(/-/g,'');
+  const evts = [];
+  for (const cal of calendars.slice(0,5)) {
+    const r = await fetch(
+      `https://calendar.zoho.com/api/v1/calendars/${cal.uid}/events?range_start=${fmt(s)}&range_end=${fmt(e)}`,
+      { headers: { Authorization:`Zoho-oauthtoken ${tokens.zoho.access_token}` } }
+    ).catch(()=>null);
+    if (!r?.ok) continue;
+    const d = await r.json();
+    (d.events||[]).forEach(ev=>evts.push({
+      title:  ev.title||'(No title)',
+      start:  new Date(ev.dateandtime?.start??ev.startdate),
+      end:    new Date(ev.dateandtime?.end??ev.enddate),
+      allDay: !ev.dateandtime, source: 'zoho',
+    }));
+  }
+  return evts;
+}
+async function fetchAllEvents() {
+  const [goog, zoho] = await Promise.allSettled([fetchGoogleEvents(), fetchZohoEvents()]);
+  allEvents = [
+    ...(goog.status==='fulfilled'?goog.value:[]),
+    ...(zoho.status==='fulfilled'?zoho.value:[]),
+  ];
+  renderWeekly(); renderMiniCal();
+}
+setInterval(fetchAllEvents, 10*60*1000);
+
+// ── Push Todo to Calendar ─────────────────────────────────
+async function pushTodoToCalendar(todo) {
+  const date = new Date(todo.date).toISOString().slice(0,10);
+  if (tokens.google?.access_token) {
+    await fetch('https://www.googleapis.com/calendar/v3/calendars/primary/events', {
+      method: 'POST',
+      headers: { Authorization:`Bearer ${tokens.google.access_token}`, 'Content-Type':'application/json' },
+      body: JSON.stringify({ summary:'✓ '+todo.text, start:{date}, end:{date} }),
+    }).catch(()=>{});
+  }
+}
+
+// ── Weather ───────────────────────────────────────────────
+async function fetchWeather() {
+  if (!CONFIG.weatherApiKey) return;
+  try {
+    const base = 'https://api.openweathermap.org/data/2.5';
+    const [cur, fore] = await Promise.all([
+      fetch(`${base}/weather?lat=${CONFIG.lat}&lon=${CONFIG.lon}&units=imperial&appid=${CONFIG.weatherApiKey}`).then(r=>r.json()),
+      fetch(`${base}/forecast?lat=${CONFIG.lat}&lon=${CONFIG.lon}&units=imperial&appid=${CONFIG.weatherApiKey}`).then(r=>r.json()),
+    ]);
+    document.getElementById('wx-icon').textContent = WX_ICONS[cur.weather[0].icon]??'🌡';
+    document.getElementById('wx-temp').textContent = Math.round(cur.main.temp)+'°F';
+    document.getElementById('wx-desc').textContent = cur.weather[0].description;
+    document.getElementById('wx-meta').textContent =
+      `Feels ${Math.round(cur.main.feels_like)}° · 💧${cur.main.humidity}%`;
+    const days = {};
+    for (const item of fore.list) {
+      const d = item.dt_txt.slice(0,10);
+      if (!days[d]||item.dt_txt.includes('12:')) days[d]=item;
+    }
+    document.getElementById('wx-forecast').innerHTML =
+      Object.entries(days).slice(1,6).map(([d,item])=>{
+        const date = new Date(d+'T12:00:00');
+        return `<div class="fc-day">
+          <div class="fc-name">${DAYS[date.getDay()]}</div>
+          <div>${WX_ICONS[item.weather[0].icon]??'🌡'}</div>
+          <div class="fc-hi">${Math.round(item.main.temp_max)}°</div>
+          <div class="fc-lo">${Math.round(item.main.temp_min)}°</div>
+        </div>`;
+      }).join('');
+  } catch(e) { console.warn('Weather fetch failed', e); }
+}
+fetchWeather();
+setInterval(fetchWeather, 30*60*1000);
+
+// ── Mini Calendar ─────────────────────────────────────────
+function renderMiniCal() {
+  const now    = new Date();
+  const target = new Date(now.getFullYear(), now.getMonth()+monthOffset, 1);
+  document.getElementById('month-label').textContent =
+    `${MONTHS[target.getMonth()]} ${target.getFullYear()}`;
+  const firstDOW  = target.getDay();
+  const daysInMon = new Date(target.getFullYear(), target.getMonth()+1, 0).getDate();
+  const prevEnd   = new Date(target.getFullYear(), target.getMonth(), 0).getDate();
+  const evtDays   = new Set(allEvents.map(ev=>`${ev.start.getFullYear()}-${ev.start.getMonth()}-${ev.start.getDate()}`));
+  const ws        = startOfWeek(monthOffset===0?weekOffset:0);
+  const weekStrs  = Array.from({length:7},(_,i)=>{ const d=new Date(ws); d.setDate(ws.getDate()+i); return d.toDateString(); });
+  let html = '<table><thead><tr>';
+  DAYS.forEach(d=>html+=`<th>${d[0]}</th>`);
+  html+='</tr></thead><tbody><tr>';
+  for (let i=0;i<firstDOW;i++) html+=`<td class="other-month">${prevEnd-firstDOW+i+1}</td>`;
+  for (let d=1;d<=daysInMon;d++) {
+    const cellDate = new Date(target.getFullYear(),target.getMonth(),d);
+    const key      = `${target.getFullYear()}-${target.getMonth()}-${d}`;
+    const isToday  = monthOffset===0 && d===now.getDate();
+    const inWeek   = weekStrs.includes(cellDate.toDateString());
+    const hasEvt   = evtDays.has(key);
+    let cls = isToday?'today':hasEvt?('has-event'+(inWeek?' in-week':'')):inWeek?'in-week':'';
+    html+=`<td class="${cls}">${d}</td>`;
+    if ((firstDOW+d)%7===0) html+='</tr><tr>';
+  }
+  document.getElementById('mini-cal').innerHTML = html+'</tr></tbody></table>';
+}
+function changeMonth(dir) { monthOffset+=dir; renderMiniCal(); }
+
+// ── Weekly View ───────────────────────────────────────────
+function renderWeekly() {
+  const ws  = startOfWeek(weekOffset);
+  const now = new Date();
+  const weekDays = Array.from({length:7},(_,i)=>{ const d=new Date(ws); d.setDate(ws.getDate()+i); return d; });
+  const todoEvts = todos
+    .filter(t=>{ const d=new Date(t.date); d.setHours(0,0,0,0); return weekDays.some(wd=>sameDay(wd,d)); })
+    .map(t=>({ title:(t.done?'✓ ':'○ ')+t.text, start:new Date(t.date), end:new Date(t.date), allDay:true, source:'todo' }));
+  const merged = [...allEvents,...todoEvts];
+  const hours  = Array.from({length:CONFIG.weekEndHour-CONFIG.weekStartHour},(_,i)=>i+CONFIG.weekStartHour);
+  const color  = src=>src==='google'?'var(--green)':src==='todo'?'var(--orange)':'var(--purple)';
+  let html = '<div></div>';
+  weekDays.forEach(d=>{
+    const isT = sameDay(d,now);
+    html+=`<div class="wg-header ${isT?'today-col':''}">${DAYS[d.getDay()]}<span class="wg-day-num">${d.getDate()}</span></div>`;
+  });
+  html+='<div class="wg-time" style="font-size:0.6rem;color:var(--muted)">all day</div>';
+  weekDays.forEach(d=>{
+    const evts=merged.filter(e=>e.allDay&&sameDay(e.start,d));
+    html+=`<div class="wg-cell" style="min-height:22px">${evts.map(e=>`<div class="wg-event" style="background:${color(e.source)}">${e.title}</div>`).join('')}</div>`;
+  });
+  hours.forEach(h=>{
+    const isNow=now.getHours()===h;
+    html+=`<div class="wg-time">${fmt12(h)}</div>`;
+    weekDays.forEach(d=>{
+      const evts=merged.filter(e=>!e.allDay&&sameDay(e.start,d)&&e.start.getHours()===h);
+      html+=`<div class="wg-cell ${isNow&&sameDay(d,now)?'now-row':''}">${evts.map(e=>`<div class="wg-event" style="background:${color(e.source)}">${e.title}</div>`).join('')}</div>`;
+    });
+  });
+  const grid=document.getElementById('week-grid');
+  grid.style.gridTemplateColumns='36px repeat(7,1fr)';
+  grid.innerHTML=html;
+  if (weekOffset===0) document.getElementById('week-scroll').scrollTop=Math.max(0,(now.getHours()-CONFIG.weekStartHour-2)*30);
+}
+function changeWeek(dir) { weekOffset=dir===0?0:weekOffset+dir; renderWeekly(); renderMiniCal(); }
+
+// ── Todos ─────────────────────────────────────────────────
+function saveTodos() { localStorage.setItem('dash_todos', JSON.stringify(todos)); }
+function renderTodos() {
+  const ws=startOfWeek(0), we=new Date(ws); we.setDate(ws.getDate()+7);
+  const week=todos.filter(t=>{ const d=new Date(t.date); return d>=ws&&d<we; });
+  const el=document.getElementById('todo-list');
+  if (!week.length) {
+    el.innerHTML='<li style="color:var(--muted);font-style:italic;font-size:0.8rem">No tasks this week — add one below</li>'; return;
+  }
+  el.innerHTML=week.map(t=>{
+    const i=todos.indexOf(t);
+    const dow=new Date(t.date).toLocaleDateString([],{weekday:'short'});
+    return `<li class="${t.done?'done':''}">
+      <input type="checkbox" ${t.done?'checked':''} onchange="toggleTodo(${i})">
+      <span class="todo-text">${t.text}</span>
+      <span class="todo-day-badge">${dow}</span>
+      <span onclick="deleteTodo(${i})" style="cursor:pointer;color:var(--red);font-size:0.8rem;padding-left:4px">✕</span>
+    </li>`;
+  }).join('');
+}
+function addTodo() {
+  const inp=document.getElementById('todo-input'), text=inp.value.trim();
+  if (!text) return;
+  const todo={ text, done:false, date:new Date().toISOString(), id:Date.now() };
+  todos.push(todo); saveTodos(); inp.value='';
+  renderTodos(); renderWeekly(); pushTodoToCalendar(todo);
+}
+function toggleTodo(i) { todos[i].done=!todos[i].done; saveTodos(); renderTodos(); renderWeekly(); }
+function deleteTodo(i) { todos.splice(i,1); saveTodos(); renderTodos(); renderWeekly(); }
+
+// ── Bootstrap ─────────────────────────────────────────────
+(async function init() {
+  // Show setup screen on first visit (no credentials saved yet)
+  if (!localStorage.getItem('cfg_g_id')) openSetup();
+  await handleCallback();
+  updateAuthUI();
+  renderMiniCal();
+  renderWeekly();
+  renderTodos();
+  fetchAllEvents();
+})();
+</script>
+</body>
+</html>
