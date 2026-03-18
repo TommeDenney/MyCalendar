@@ -22,184 +22,192 @@
 
 /* ── Setup Screen ── */
 #setup-screen {
-  display: none;
-  position: fixed; inset: 0; z-index: 999;
-  background: var(--bg);
-  align-items: center; justify-content: center;
+  display: none; position: fixed; inset: 0; z-index: 999;
+  background: var(--bg); align-items: center; justify-content: center;
 }
 #setup-screen.active { display: flex; }
 .setup-box {
   background: var(--surface); border: 1px solid var(--border);
-  border-radius: 14px; padding: 40px; width: 480px; max-width: 95vw;
+  border-radius: 18px; padding: 48px; width: 560px; max-width: 95vw;
 }
-.setup-box h2 { font-size: 1.3rem; margin-bottom: 6px; color: var(--text); }
-.setup-box p  { font-size: 0.82rem; color: var(--muted); margin-bottom: 28px; line-height: 1.5; }
-.setup-section { margin-bottom: 22px; }
-.setup-section h3 { font-size: 0.75rem; font-weight: 700; text-transform: uppercase;
-  letter-spacing: 1.2px; color: var(--muted); margin-bottom: 10px; }
-.setup-field { margin-bottom: 10px; }
-.setup-field label { display: block; font-size: 0.78rem; color: var(--muted); margin-bottom: 4px; }
+.setup-box h2 { font-size: 1.6rem; margin-bottom: 8px; color: var(--text); }
+.setup-box p  { font-size: 0.95rem; color: var(--muted); margin-bottom: 32px; line-height: 1.6; }
+.setup-section { margin-bottom: 28px; }
+.setup-section h3 {
+  font-size: 0.85rem; font-weight: 700; text-transform: uppercase;
+  letter-spacing: 1.2px; color: var(--muted); margin-bottom: 12px;
+}
+.setup-field { margin-bottom: 12px; }
+.setup-field label { display: block; font-size: 0.88rem; color: var(--muted); margin-bottom: 5px; }
 .setup-field input {
   width: 100%; background: var(--surface2); border: 1px solid var(--border);
-  color: var(--text); border-radius: 8px; padding: 9px 12px;
-  font-size: 0.82rem; outline: none; font-family: monospace;
+  color: var(--text); border-radius: 10px; padding: 11px 14px;
+  font-size: 0.9rem; outline: none; font-family: monospace;
 }
 .setup-field input:focus { border-color: var(--accent); }
 .setup-save {
   width: 100%; background: var(--accent); border: none; color: #000;
-  border-radius: 8px; padding: 11px; font-size: 0.9rem;
-  font-weight: 700; cursor: pointer; margin-top: 6px;
+  border-radius: 10px; padding: 14px; font-size: 1rem;
+  font-weight: 700; cursor: pointer; margin-top: 8px;
 }
-.setup-save:hover { opacity: 0.9; }
-.setup-note { font-size: 0.72rem; color: var(--muted); margin-top: 14px; text-align: center; }
+.setup-note { font-size: 0.78rem; color: var(--muted); margin-top: 16px; text-align: center; }
 
-/* ── Dashboard ── */
+/* ── Layout ── */
 body {
   background: var(--bg); color: var(--text);
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   height: 100vh; overflow: hidden;
   display: grid;
-  grid-template-rows: 72px 1fr;
-  grid-template-columns: 300px 1fr;
-  gap: 8px; padding: 8px;
+  grid-template-rows: 110px 1fr;
+  grid-template-columns: 420px 1fr;
+  gap: 12px; padding: 12px;
 }
+
+/* ── Header ── */
 header {
   grid-column: 1 / -1;
   display: flex; align-items: center; justify-content: space-between;
   background: var(--surface); border: 1px solid var(--border);
-  border-radius: 10px; padding: 0 20px;
+  border-radius: 14px; padding: 0 32px;
 }
-#date-display { font-size: 1rem; color: var(--muted); }
-#clock { font-size: 2.2rem; font-weight: 700; color: var(--accent); letter-spacing: 2px; }
-.header-right { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; justify-content: flex-end; }
+#date-display { font-size: 1.5rem; color: var(--muted); font-weight: 500; }
+#clock { font-size: 3.8rem; font-weight: 800; color: var(--accent); letter-spacing: 4px; }
+.header-right { display: flex; align-items: center; gap: 12px; }
 .auth-btn {
-  padding: 5px 12px; border-radius: 20px; border: 1px solid var(--border);
+  padding: 10px 22px; border-radius: 30px; border: 2px solid var(--border);
   background: var(--surface2); color: var(--muted);
-  cursor: pointer; font-size: 0.75rem; font-weight: 600; transition: all 0.2s;
+  cursor: pointer; font-size: 1rem; font-weight: 700; transition: all 0.2s;
 }
 .auth-btn.connected    { border-color: var(--green); color: var(--green); }
 .auth-btn.disconnected { border-color: var(--border); color: var(--muted); }
 .icon-btn {
-  padding: 5px 12px; border-radius: 20px; border: 1px solid var(--border);
+  padding: 10px 22px; border-radius: 30px; border: 2px solid var(--border);
   background: var(--surface2); color: var(--text);
-  cursor: pointer; font-size: 0.75rem; font-weight: 600;
+  cursor: pointer; font-size: 1rem; font-weight: 700;
 }
 .icon-btn:hover { background: var(--accent); color: #000; border-color: var(--accent); }
+
+/* ── Cards ── */
 .card {
   background: var(--surface); border: 1px solid var(--border);
-  border-radius: 10px; padding: 14px; overflow: hidden;
+  border-radius: 14px; padding: 20px; overflow: hidden;
 }
 .card-label {
-  font-size: 0.65rem; font-weight: 700; text-transform: uppercase;
-  letter-spacing: 1.5px; color: var(--muted); margin-bottom: 10px;
+  font-size: 0.85rem; font-weight: 800; text-transform: uppercase;
+  letter-spacing: 2px; color: var(--muted); margin-bottom: 14px;
 }
-.left-panel  { display: flex; flex-direction: column; gap: 8px; overflow: hidden; }
-.right-panel { display: flex; flex-direction: column; gap: 8px; overflow: hidden; }
+.left-panel  { display: flex; flex-direction: column; gap: 12px; overflow: hidden; }
+.right-panel { display: flex; flex-direction: column; gap: 12px; overflow: hidden; }
 
-/* Weather */
-#wx-today { display: flex; align-items: center; gap: 14px; margin-bottom: 10px; }
-#wx-icon  { font-size: 2.8rem; line-height: 1; }
-#wx-temp  { font-size: 2.2rem; font-weight: 800; }
-#wx-desc  { font-size: 0.8rem; color: var(--muted); text-transform: capitalize; }
-#wx-meta  { font-size: 0.75rem; color: var(--muted); margin-top: 2px; }
-#wx-forecast { display: flex; gap: 5px; }
+/* ── Weather ── */
+#wx-today { display: flex; align-items: center; gap: 20px; margin-bottom: 16px; }
+#wx-icon  { font-size: 4.5rem; line-height: 1; }
+#wx-temp  { font-size: 3.8rem; font-weight: 900; line-height: 1; }
+#wx-desc  { font-size: 1.15rem; color: var(--muted); text-transform: capitalize; margin-top: 4px; }
+#wx-meta  { font-size: 1rem; color: var(--muted); margin-top: 4px; }
+#wx-forecast { display: flex; gap: 8px; }
 .fc-day {
   flex: 1; text-align: center; background: var(--surface2);
-  border-radius: 8px; padding: 6px 3px; font-size: 0.72rem;
+  border-radius: 12px; padding: 10px 4px; font-size: 1rem;
 }
-.fc-day .fc-name { color: var(--muted); font-size: 0.65rem; margin-bottom: 2px; }
-.fc-day .fc-hi   { font-weight: 700; }
-.fc-day .fc-lo   { color: var(--muted); font-size: 0.65rem; }
+.fc-day .fc-name { color: var(--muted); font-size: 0.85rem; margin-bottom: 4px; font-weight: 600; }
+.fc-day .fc-hi   { font-size: 1.15rem; font-weight: 800; }
+.fc-day .fc-lo   { color: var(--muted); font-size: 0.9rem; margin-top: 2px; }
+.fc-day .fc-icon { font-size: 1.4rem; }
 
-/* Mini Calendar */
+/* ── Mini Calendar ── */
 #mini-cal-card { flex: 1; display: flex; flex-direction: column; }
-.cal-nav { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+.cal-nav { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
 .cal-nav-btn {
   background: var(--surface2); border: 1px solid var(--border);
-  color: var(--text); border-radius: 5px; padding: 2px 8px; cursor: pointer; font-size: 0.85rem;
+  color: var(--text); border-radius: 8px; padding: 6px 16px;
+  cursor: pointer; font-size: 1.1rem; font-weight: 700;
 }
-#month-label { font-size: 0.85rem; font-weight: 600; }
+#month-label { font-size: 1.2rem; font-weight: 700; }
 #mini-cal table { width: 100%; border-collapse: collapse; }
-#mini-cal th { color: var(--muted); font-size: 0.65rem; text-align: center; padding: 3px 0; font-weight: 600; }
-#mini-cal td { text-align: center; font-size: 0.78rem; padding: 3px 1px; border-radius: 50%; cursor: default; }
-#mini-cal td.today       { background: var(--accent); color: #000 !important; font-weight: 800; }
-#mini-cal td.has-event   { color: var(--accent); font-weight: 600; }
+#mini-cal th {
+  color: var(--muted); font-size: 0.9rem; text-align: center;
+  padding: 6px 0; font-weight: 700; letter-spacing: 0.5px;
+}
+#mini-cal td {
+  text-align: center; font-size: 1.05rem; padding: 5px 2px;
+  border-radius: 6px; cursor: default; line-height: 1.6;
+}
+#mini-cal td.today       { background: var(--accent); color: #000 !important; font-weight: 900; border-radius: 50%; }
+#mini-cal td.has-event   { color: var(--accent); font-weight: 700; }
 #mini-cal td.other-month { color: var(--border); }
-#mini-cal td.in-week     { background: var(--surface2); border-radius: 3px; }
+#mini-cal td.in-week     { background: var(--surface2); border-radius: 4px; }
 
-/* Weekly */
+/* ── Weekly ── */
 #weekly-card { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
-.week-nav { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+.week-nav { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
 .week-nav-btn {
   background: var(--surface2); border: 1px solid var(--border);
-  color: var(--text); border-radius: 6px; padding: 3px 12px; cursor: pointer; font-size: 0.78rem;
+  color: var(--text); border-radius: 8px; padding: 8px 20px;
+  cursor: pointer; font-size: 0.95rem; font-weight: 700;
 }
 .week-today-btn {
   background: var(--accent); border: none; color: #000;
-  border-radius: 6px; padding: 3px 12px; cursor: pointer; font-size: 0.78rem; font-weight: 700;
+  border-radius: 8px; padding: 8px 20px;
+  cursor: pointer; font-size: 0.95rem; font-weight: 800;
 }
+.legend { display: flex; gap: 20px; font-size: 0.9rem; color: var(--muted); margin-bottom: 8px; }
+.legend span { display: flex; align-items: center; gap: 6px; font-weight: 600; }
+.dot { width: 11px; height: 11px; border-radius: 50%; display: inline-block; }
 #week-scroll { flex: 1; overflow-y: auto; overflow-x: hidden; }
-#week-scroll::-webkit-scrollbar { width: 4px; }
-#week-scroll::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
-#week-grid { display: grid; grid-template-columns: 36px repeat(7,1fr); gap: 2px; }
+#week-scroll::-webkit-scrollbar { width: 5px; }
+#week-scroll::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+#week-grid { display: grid; grid-template-columns: 50px repeat(7,1fr); gap: 3px; }
 .wg-header {
-  text-align: center; padding: 5px 2px;
-  background: var(--surface2); border-radius: 6px; font-size: 0.72rem;
+  text-align: center; padding: 8px 4px;
+  background: var(--surface2); border-radius: 8px; font-size: 0.9rem; font-weight: 700;
 }
-.wg-header .wg-day-num { font-size: 1.05rem; font-weight: 700; display: block; line-height: 1.2; }
+.wg-header .wg-day-num {
+  font-size: 1.5rem; font-weight: 900; display: block; line-height: 1.2; margin-top: 2px;
+}
 .wg-header.today-col, .wg-header.today-col .wg-day-num { color: var(--accent); }
-.wg-time { font-size: 0.58rem; color: var(--muted); text-align: right; padding-right: 4px; padding-top: 3px; }
-.wg-cell { background: var(--surface2); border-radius: 3px; min-height: 28px; overflow: hidden; }
-.wg-cell.now-row { border-top: 2px solid var(--accent); }
+.wg-time {
+  font-size: 0.78rem; color: var(--muted);
+  text-align: right; padding-right: 6px; padding-top: 5px; line-height: 1;
+}
+.wg-cell { background: var(--surface2); border-radius: 4px; min-height: 36px; overflow: hidden; }
+.wg-cell.now-row { border-top: 3px solid var(--accent); }
 .wg-event {
-  font-size: 0.6rem; font-weight: 700; padding: 1px 4px; border-radius: 2px; margin: 1px;
-  white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: #000;
+  font-size: 0.82rem; font-weight: 800; padding: 3px 6px;
+  border-radius: 4px; margin: 2px; white-space: nowrap;
+  overflow: hidden; text-overflow: ellipsis; color: #000;
 }
 
-/* Todos */
+/* ── Tasks (read-only, no input) ── */
 #todo-card { flex: 0 0 auto; }
-#todo-list { list-style: none; max-height: 130px; overflow-y: auto; margin-bottom: 8px; }
-#todo-list::-webkit-scrollbar { width: 3px; }
+#todo-list { list-style: none; max-height: 160px; overflow-y: auto; }
+#todo-list::-webkit-scrollbar { width: 4px; }
 #todo-list::-webkit-scrollbar-thumb { background: var(--border); }
 #todo-list li {
-  display: flex; align-items: center; gap: 8px;
-  padding: 5px 0; border-bottom: 1px solid var(--border); font-size: 0.83rem;
+  display: flex; align-items: center; gap: 12px;
+  padding: 8px 0; border-bottom: 1px solid var(--border); font-size: 1.05rem;
 }
 #todo-list li:last-child { border-bottom: none; }
 #todo-list li.done span.todo-text { text-decoration: line-through; color: var(--muted); }
-#todo-list li input[type="checkbox"] { accent-color: var(--orange); flex-shrink: 0; }
 .todo-day-badge {
-  margin-left: auto; flex-shrink: 0; font-size: 0.65rem; color: var(--muted);
-  background: var(--surface2); border-radius: 4px; padding: 1px 5px;
+  margin-left: auto; flex-shrink: 0; font-size: 0.85rem; color: var(--muted);
+  background: var(--surface2); border-radius: 6px; padding: 2px 8px; font-weight: 600;
 }
-#todo-form { display: flex; gap: 6px; }
-#todo-input {
-  flex: 1; background: var(--surface2); border: 1px solid var(--border);
-  color: var(--text); border-radius: 7px; padding: 7px 10px; font-size: 0.82rem; outline: none;
-}
-#todo-input:focus { border-color: var(--orange); }
-#todo-add {
-  background: var(--orange); border: none; color: #000;
-  border-radius: 7px; padding: 7px 14px; font-weight: 700; cursor: pointer; font-size: 0.82rem;
-}
-.legend { display: flex; gap: 10px; font-size: 0.65rem; color: var(--muted); margin-bottom: 6px; }
-.legend span { display: flex; align-items: center; gap: 3px; }
-.dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; }
 </style>
 </head>
 <body>
 
-<!-- ── Setup Screen ────────────────────────────────── -->
+<!-- ── Setup Screen ── -->
 <div id="setup-screen">
   <div class="setup-box">
     <h2>📅 Dashboard Setup</h2>
-    <p>Enter your credentials below. They're saved only in <strong>your browser</strong> — nothing is stored in the code or on GitHub.</p>
+    <p>Enter your credentials below. Saved only in <strong>your browser</strong> — nothing stored in code or on GitHub.</p>
 
     <div class="setup-section">
       <h3>🌤 OpenWeatherMap</h3>
       <div class="setup-field">
         <label>API Key</label>
-        <input id="s-wx-key" placeholder="e.g. 724712c78c2fc2589c0bd342ddbc239c">
+        <input id="s-wx-key" placeholder="your api key">
       </div>
       <div class="setup-field">
         <label>Latitude</label>
@@ -209,7 +217,7 @@ header {
         <label>Longitude</label>
         <input id="s-lon" placeholder="Detecting…">
       </div>
-      <div id="geo-status" style="font-size:0.72rem;color:var(--muted);margin-top:-4px"></div>
+      <div id="geo-status" style="font-size:0.82rem;color:var(--muted);margin-top:-6px"></div>
     </div>
 
     <div class="setup-section">
@@ -224,30 +232,21 @@ header {
       </div>
     </div>
 
-  /* ZOHO COMMENTED OUT
+    <!-- ZOHO COMMENTED OUT
     <div class="setup-section">
       <h3>Z Zoho Calendar</h3>
-      <div class="setup-field">
-        <label>Client ID</label>
-        <input id="s-z-id" placeholder="1000.XXXX...">
-      </div>
-      <div class="setup-field">
-        <label>Client Secret</label>
-        <input id="s-z-secret" placeholder="abc123...">
-      </div>
-      <div class="setup-field">
-        <label>Token Proxy URL <span style="color:var(--muted);font-weight:400">(Cloudflare Worker URL)</span></label>
-        <input id="s-z-proxy" placeholder="https://zoho-token-proxy.YOURNAME.workers.dev">
-      </div>
+      <div class="setup-field"><label>Client ID</label><input id="s-z-id"></div>
+      <div class="setup-field"><label>Client Secret</label><input id="s-z-secret"></div>
+      <div class="setup-field"><label>Proxy URL</label><input id="s-z-proxy"></div>
     </div>
-  */
+    -->
 
     <button class="setup-save" onclick="saveSetup()">Save & Launch Dashboard</button>
-    <div class="setup-note">🔒 Credentials are stored in localStorage on this device only and never sent anywhere except the official OAuth/API endpoints.</div>
+    <div class="setup-note">🔒 Credentials stored in localStorage on this device only.</div>
   </div>
 </div>
 
-<!-- ── Dashboard ───────────────────────────────────── -->
+<!-- ── Dashboard ── -->
 <header>
   <div><div id="date-display">Loading...</div></div>
   <div id="clock">--:--</div>
@@ -287,7 +286,7 @@ header {
   <div class="card" id="weekly-card">
     <div class="week-nav">
       <div class="card-label" style="margin:0">Weekly Schedule</div>
-      <div style="display:flex;gap:6px">
+      <div style="display:flex;gap:8px">
         <button class="week-nav-btn" onclick="changeWeek(-1)">‹ Prev</button>
         <button class="week-today-btn" onclick="changeWeek(0)">Today</button>
         <button class="week-nav-btn" onclick="changeWeek(1)">Next ›</button>
@@ -304,37 +303,24 @@ header {
   <div class="card" id="todo-card">
     <div class="card-label">This Week's Tasks</div>
     <ul id="todo-list"></ul>
-    <div id="todo-form">
-      <input id="todo-input" placeholder="Add a task for this week… (Enter to save)"
-             onkeydown="if(event.key==='Enter') addTodo()">
-      <button id="todo-add" onclick="addTodo()">+ Add</button>
-    </div>
   </div>
 </div>
 
 <script>
-// ── Load config from localStorage (no secrets in code) ──
 function loadConfig() {
   return {
-    weatherApiKey: localStorage.getItem('cfg_wx_key')    || '',
-    lat:  parseFloat(localStorage.getItem('cfg_lat'))    || 0,
-    lon:  parseFloat(localStorage.getItem('cfg_lon'))    || 0,
+    weatherApiKey: localStorage.getItem('cfg_wx_key') || '',
+    lat:  parseFloat(localStorage.getItem('cfg_lat')) || 0,
+    lon:  parseFloat(localStorage.getItem('cfg_lon')) || 0,
     google: {
       clientId:     localStorage.getItem('cfg_g_id')     || '',
       clientSecret: localStorage.getItem('cfg_g_secret') || '',
     },
-    zoho: {
-      clientId:     localStorage.getItem('cfg_z_id')     || '',
-      clientSecret: localStorage.getItem('cfg_z_secret') || '',
-      proxyUrl:     localStorage.getItem('cfg_z_proxy')  || '',
-    },
-    todosCalendar: 'google',
     weekStartHour: 7,
     weekEndHour:   22,
   };
 }
 
-// ── Setup UI ────────────────────────────────────────────
 function openSetup() {
   const c = loadConfig();
   document.getElementById('s-wx-key').value   = c.weatherApiKey;
@@ -342,11 +328,7 @@ function openSetup() {
   document.getElementById('s-lon').value      = c.lon || '';
   document.getElementById('s-g-id').value     = c.google.clientId;
   document.getElementById('s-g-secret').value = c.google.clientSecret;
-  document.getElementById('s-z-id').value     = c.zoho.clientId;
-  document.getElementById('s-z-secret').value = c.zoho.clientSecret;
-  document.getElementById('s-z-proxy').value  = c.zoho.proxyUrl;
   document.getElementById('setup-screen').classList.add('active');
-  // Auto-detect location if fields are empty
   if (!c.lat && navigator.geolocation) {
     document.getElementById('geo-status').textContent = '📍 Detecting your location…';
     navigator.geolocation.getCurrentPosition(
@@ -355,7 +337,7 @@ function openSetup() {
         document.getElementById('s-lon').value = pos.coords.longitude.toFixed(4);
         document.getElementById('geo-status').textContent = '✅ Location detected';
       },
-      () => { document.getElementById('geo-status').textContent = '⚠️ Could not detect location — enter manually'; }
+      () => { document.getElementById('geo-status').textContent = '⚠️ Could not detect — enter manually'; }
     );
   }
 }
@@ -365,15 +347,10 @@ function saveSetup() {
   localStorage.setItem('cfg_lon',      document.getElementById('s-lon').value.trim());
   localStorage.setItem('cfg_g_id',     document.getElementById('s-g-id').value.trim());
   localStorage.setItem('cfg_g_secret', document.getElementById('s-g-secret').value.trim());
-  localStorage.setItem('cfg_z_id',     document.getElementById('s-z-id').value.trim());
-  localStorage.setItem('cfg_z_secret', document.getElementById('s-z-secret').value.trim());
-  localStorage.setItem('cfg_z_proxy',  document.getElementById('s-z-proxy').value.trim());
   document.getElementById('setup-screen').classList.remove('active');
-  // Reload so all config is fresh
   location.reload();
 }
 
-// ── Constants ────────────────────────────────────────────
 const REDIRECT = window.location.origin + window.location.pathname;
 const DAYS   = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
 const MONTHS = ['January','February','March','April','May','June',
@@ -385,16 +362,14 @@ const WX_ICONS = {
 };
 
 let CONFIG      = loadConfig();
-let monthOffset = 0;
-let weekOffset  = 0;
+let monthOffset = 0, weekOffset = 0;
 let allEvents   = [];
-let todos       = JSON.parse(localStorage.getItem('dash_todos') || '[]');
-let tokens      = {
+let todos       = [];
+
+let tokens = {
   google: JSON.parse(localStorage.getItem('tok_goog') || 'null'),
-  zoho:   JSON.parse(localStorage.getItem('tok_zoho') || 'null'),
 };
 
-// ── Utils ────────────────────────────────────────────────
 function randStr(len) {
   const a = new Uint8Array(Math.ceil(len*3/4));
   crypto.getRandomValues(a);
@@ -414,7 +389,6 @@ function startOfWeek(offset) {
 function sameDay(a,b) { return a.toDateString()===b.toDateString(); }
 function fmt12(h) { if(h===0)return'12a'; if(h===12)return'12p'; return h>12?`${h-12}p`:`${h}a`; }
 
-// ── Clock ─────────────────────────────────────────────────
 function tick() {
   const n = new Date();
   document.getElementById('clock').textContent =
@@ -426,23 +400,16 @@ setInterval(tick,1000); tick();
 
 function goFullscreen() { document.documentElement.requestFullscreen?.(); }
 
-// ── Auth UI ───────────────────────────────────────────────
 function updateAuthUI() {
-  const set = (id, ok) => {
-    const btn = document.getElementById(id);
-    btn.className = 'auth-btn '+(ok?'connected':'disconnected');
-  };
-  set('google-btn', !!tokens.google);
-  set('zoho-btn',   !!tokens.zoho);
+  const btn = document.getElementById('google-btn');
+  btn.className = 'auth-btn ' + (tokens.google ? 'connected' : 'disconnected');
 }
 
-// ── Google OAuth ──────────────────────────────────────────
 async function connectGoogle() {
   if (!CONFIG.google.clientId) { alert('Add your Google credentials in ⚙ Setup first.'); return; }
   if (tokens.google) {
     tokens.google = null; localStorage.removeItem('tok_goog');
-    updateAuthUI(); allEvents = allEvents.filter(e=>e.source!=='google');
-    renderWeekly(); renderMiniCal(); return;
+    updateAuthUI(); allEvents = []; renderWeekly(); renderMiniCal(); return;
   }
   const v = randStr(64), c = await pkceChallenge(v);
   sessionStorage.setItem('pkce_goog', v);
@@ -468,143 +435,62 @@ async function exchangeGoogle(code) {
   else console.error('Google token exchange failed', d);
 }
 
-// ── Zoho OAuth ────────────────────────────────────────────
-async function connectZoho() {
-  if (!CONFIG.zoho.clientId) { alert('Add your Zoho credentials in ⚙ Setup first.'); return; }
-  if (tokens.zoho) {
-    tokens.zoho = null; localStorage.removeItem('tok_zoho');
-    updateAuthUI(); allEvents = allEvents.filter(e=>e.source!=='zoho');
-    renderWeekly(); renderMiniCal(); return;
-  }
-  const v = randStr(64), c = await pkceChallenge(v);
-  sessionStorage.setItem('pkce_zoho', v);
-  const p = new URLSearchParams({
-    client_id: CONFIG.zoho.clientId, response_type: 'code', redirect_uri: REDIRECT,
-    scope: 'ZohoCalendar.calendar.ALL', code_challenge: c,
-    code_challenge_method: 'S256', access_type: 'offline', state: 'zoho',
-  });
-  location.href = `https://accounts.zoho.com/oauth/v2/auth?${p}`;
-}
-async function exchangeZoho(code) {
-  const proxyUrl = CONFIG.zoho.proxyUrl;
-  if (!proxyUrl) { console.warn('Zoho proxy URL not set in Setup'); return; }
-  const r = await fetch(proxyUrl, {
-    method: 'POST',
-    headers: {'Content-Type':'application/x-www-form-urlencoded'},
-    body: new URLSearchParams({
-      client_id: CONFIG.zoho.clientId, client_secret: CONFIG.zoho.clientSecret,
-      grant_type: 'authorization_code', code, redirect_uri: REDIRECT,
-      code_verifier: sessionStorage.getItem('pkce_zoho'),
-    })
-  });
-  const d = await r.json();
-  if (d.access_token) { tokens.zoho = d; localStorage.setItem('tok_zoho', JSON.stringify(d)); }
-  else console.error('Zoho token exchange failed', d);
-}
-
-// ── OAuth Callback Handler ────────────────────────────────
 async function handleCallback() {
   const p = new URLSearchParams(location.search);
   const code = p.get('code'), state = p.get('state');
   if (!code) return;
   history.replaceState({}, '', location.pathname);
-  if      (state==='goog') await exchangeGoogle(code);
-  else if (state==='zoho') await exchangeZoho(code);
+  if (state==='goog') await exchangeGoogle(code);
   updateAuthUI(); fetchAllEvents();
 }
 
-// ── Fetch Events ──────────────────────────────────────────
 async function fetchGoogleEvents() {
   if (!tokens.google?.access_token) return [];
   const s = new Date(); s.setDate(s.getDate()-35);
   const e = new Date(); e.setDate(e.getDate()+60);
   const headers = { Authorization:`Bearer ${tokens.google.access_token}` };
-
-  // Step 1: get all calendars the user has
   const calListR = await fetch(
-    'https://www.googleapis.com/calendar/v3/users/me/calendarList?maxResults=50',
-    { headers }
+    'https://www.googleapis.com/calendar/v3/users/me/calendarList?maxResults=50', { headers }
   );
-  if (!calListR.ok) {
-    console.error('Google calendarList failed:', calListR.status, await calListR.text());
-    return [];
-  }
-  const calList = await calListR.json();
-  const calIds  = (calList.items||[]).map(c => c.id);
-  console.log('Google calendars found:', calIds);
-
-  // Step 2: fetch events from every calendar in parallel
-  const results = await Promise.allSettled(calIds.map(calId =>
+  if (!calListR.ok) { console.error('calendarList failed:', calListR.status); return []; }
+  const calList  = await calListR.json();
+  const calIds   = (calList.items||[]).map(c => c.id);
+  console.log('Google calendars:', calIds);
+  const results  = await Promise.allSettled(calIds.map(id =>
     fetch(
-      `https://www.googleapis.com/calendar/v3/calendars/${encodeURIComponent(calId)}/events?timeMin=${s.toISOString()}&timeMax=${e.toISOString()}&singleEvents=true&orderBy=startTime&maxResults=250`,
+      `https://www.googleapis.com/calendar/v3/calendars/${encodeURIComponent(id)}/events?timeMin=${s.toISOString()}&timeMax=${e.toISOString()}&singleEvents=true&orderBy=startTime&maxResults=250`,
       { headers }
-    ).then(r => {
-      if (!r.ok) { console.warn(`Calendar ${calId} fetch failed:`, r.status); return {items:[]}; }
-      return r.json();
-    })
+    ).then(r => r.ok ? r.json() : {items:[]})
   ));
-
   const evts = [];
   results.forEach(res => {
-    if (res.status === 'fulfilled') {
-      (res.value.items||[]).forEach(ev => evts.push({
-        title:  ev.summary||'(No title)',
-        start:  new Date(ev.start.dateTime??ev.start.date),
-        end:    new Date(ev.end.dateTime??ev.end.date),
-        allDay: !ev.start.dateTime, source: 'google',
-      }));
+    if (res.status==='fulfilled') {
+      (res.value.items||[]).forEach(ev => {
+        // Separate tasks (✓ prefix) from regular events
+        const isTask = (ev.summary||'').startsWith('✓');
+        evts.push({
+          title:  ev.summary||'(No title)',
+          start:  new Date(ev.start.dateTime??ev.start.date),
+          end:    new Date(ev.end.dateTime??ev.end.date),
+          allDay: !ev.start.dateTime,
+          source: isTask ? 'todo' : 'google',
+        });
+      });
     }
   });
   console.log('Google events loaded:', evts.length);
   return evts;
 }
-async function fetchZohoEvents() {
-  if (!tokens.zoho?.access_token) return [];
-  const calR = await fetch('https://calendar.zoho.com/api/v1/calendars',
-    { headers: { Authorization:`Zoho-oauthtoken ${tokens.zoho.access_token}` } });
-  if (!calR.ok) return [];
-  const { calendars=[] } = await calR.json();
-  const s = new Date(); s.setDate(s.getDate()-35);
-  const e = new Date(); e.setDate(e.getDate()+60);
-  const fmt = d => d.toISOString().slice(0,10).replace(/-/g,'');
-  const evts = [];
-  for (const cal of calendars.slice(0,5)) {
-    const r = await fetch(
-      `https://calendar.zoho.com/api/v1/calendars/${cal.uid}/events?range_start=${fmt(s)}&range_end=${fmt(e)}`,
-      { headers: { Authorization:`Zoho-oauthtoken ${tokens.zoho.access_token}` } }
-    ).catch(()=>null);
-    if (!r?.ok) continue;
-    const d = await r.json();
-    (d.events||[]).forEach(ev=>evts.push({
-      title:  ev.title||'(No title)',
-      start:  new Date(ev.dateandtime?.start??ev.startdate),
-      end:    new Date(ev.dateandtime?.end??ev.enddate),
-      allDay: !ev.dateandtime, source: 'zoho',
-    }));
-  }
-  return evts;
-}
+
 async function fetchAllEvents() {
   const [goog] = await Promise.allSettled([fetchGoogleEvents()]);
-  allEvents = [...(goog.status==='fulfilled'?goog.value:[])];
-  // ZOHO COMMENTED OUT: const zoho = await fetchZohoEvents();
-  renderWeekly(); renderMiniCal();
+  const all = goog.status==='fulfilled' ? goog.value : [];
+  todos     = all.filter(e => e.source==='todo');
+  allEvents = all.filter(e => e.source!=='todo');
+  renderWeekly(); renderMiniCal(); renderTodos();
 }
 setInterval(fetchAllEvents, 10*60*1000);
 
-// ── Push Todo to Calendar ─────────────────────────────────
-async function pushTodoToCalendar(todo) {
-  const date = new Date(todo.date).toISOString().slice(0,10);
-  if (tokens.google?.access_token) {
-    await fetch('https://www.googleapis.com/calendar/v3/calendars/primary/events', {
-      method: 'POST',
-      headers: { Authorization:`Bearer ${tokens.google.access_token}`, 'Content-Type':'application/json' },
-      body: JSON.stringify({ summary:'✓ '+todo.text, start:{date}, end:{date} }),
-    }).catch(()=>{});
-  }
-}
-
-// ── Weather ───────────────────────────────────────────────
 async function fetchWeather() {
   if (!CONFIG.weatherApiKey) return;
   try {
@@ -628,17 +514,16 @@ async function fetchWeather() {
         const date = new Date(d+'T12:00:00');
         return `<div class="fc-day">
           <div class="fc-name">${DAYS[date.getDay()]}</div>
-          <div>${WX_ICONS[item.weather[0].icon]??'🌡'}</div>
+          <div class="fc-icon">${WX_ICONS[item.weather[0].icon]??'🌡'}</div>
           <div class="fc-hi">${Math.round(item.main.temp_max)}°</div>
           <div class="fc-lo">${Math.round(item.main.temp_min)}°</div>
         </div>`;
       }).join('');
-  } catch(e) { console.warn('Weather fetch failed', e); }
+  } catch(e) { console.warn('Weather failed', e); }
 }
 fetchWeather();
 setInterval(fetchWeather, 30*60*1000);
 
-// ── Mini Calendar ─────────────────────────────────────────
 function renderMiniCal() {
   const now    = new Date();
   const target = new Date(now.getFullYear(), now.getMonth()+monthOffset, 1);
@@ -668,26 +553,23 @@ function renderMiniCal() {
 }
 function changeMonth(dir) { monthOffset+=dir; renderMiniCal(); }
 
-// ── Weekly View ───────────────────────────────────────────
 function renderWeekly() {
   const ws  = startOfWeek(weekOffset);
   const now = new Date();
   const weekDays = Array.from({length:7},(_,i)=>{ const d=new Date(ws); d.setDate(ws.getDate()+i); return d; });
-  const todoEvts = todos
-    .filter(t=>{ const d=new Date(t.date); d.setHours(0,0,0,0); return weekDays.some(wd=>sameDay(wd,d)); })
-    .map(t=>({ title:(t.done?'✓ ':'○ ')+t.text, start:new Date(t.date), end:new Date(t.date), allDay:true, source:'todo' }));
-  const merged = [...allEvents,...todoEvts];
-  const hours  = Array.from({length:CONFIG.weekEndHour-CONFIG.weekStartHour},(_,i)=>i+CONFIG.weekStartHour);
-  const color  = src=>src==='google'?'var(--green)':src==='todo'?'var(--orange)':'var(--purple)';
+  const todoEvts = todos.filter(t=>weekDays.some(wd=>sameDay(wd,t.start)));
+  const merged   = [...allEvents, ...todoEvts];
+  const hours    = Array.from({length:CONFIG.weekEndHour-CONFIG.weekStartHour},(_,i)=>i+CONFIG.weekStartHour);
+  const color    = src=>src==='google'?'var(--green)':src==='todo'?'var(--orange)':'var(--purple)';
   let html = '<div></div>';
   weekDays.forEach(d=>{
     const isT = sameDay(d,now);
     html+=`<div class="wg-header ${isT?'today-col':''}">${DAYS[d.getDay()]}<span class="wg-day-num">${d.getDate()}</span></div>`;
   });
-  html+='<div class="wg-time" style="font-size:0.6rem;color:var(--muted)">all day</div>';
+  html+='<div class="wg-time" style="font-size:0.78rem;padding-top:4px">all day</div>';
   weekDays.forEach(d=>{
     const evts=merged.filter(e=>e.allDay&&sameDay(e.start,d));
-    html+=`<div class="wg-cell" style="min-height:22px">${evts.map(e=>`<div class="wg-event" style="background:${color(e.source)}">${e.title}</div>`).join('')}</div>`;
+    html+=`<div class="wg-cell" style="min-height:32px">${evts.map(e=>`<div class="wg-event" style="background:${color(e.source)}">${e.title}</div>`).join('')}</div>`;
   });
   hours.forEach(h=>{
     const isNow=now.getHours()===h;
@@ -698,45 +580,31 @@ function renderWeekly() {
     });
   });
   const grid=document.getElementById('week-grid');
-  grid.style.gridTemplateColumns='36px repeat(7,1fr)';
+  grid.style.gridTemplateColumns='50px repeat(7,1fr)';
   grid.innerHTML=html;
-  if (weekOffset===0) document.getElementById('week-scroll').scrollTop=Math.max(0,(now.getHours()-CONFIG.weekStartHour-2)*30);
+  if (weekOffset===0) document.getElementById('week-scroll').scrollTop=Math.max(0,(now.getHours()-CONFIG.weekStartHour-2)*38);
 }
 function changeWeek(dir) { weekOffset=dir===0?0:weekOffset+dir; renderWeekly(); renderMiniCal(); }
 
-// ── Todos ─────────────────────────────────────────────────
-function saveTodos() { localStorage.setItem('dash_todos', JSON.stringify(todos)); }
 function renderTodos() {
   const ws=startOfWeek(0), we=new Date(ws); we.setDate(ws.getDate()+7);
-  const week=todos.filter(t=>{ const d=new Date(t.date); return d>=ws&&d<we; });
+  const week=todos.filter(t=>{ const d=new Date(t.start); return d>=ws&&d<we; });
   const el=document.getElementById('todo-list');
   if (!week.length) {
-    el.innerHTML='<li style="color:var(--muted);font-style:italic;font-size:0.8rem">No tasks this week — add one below</li>'; return;
+    el.innerHTML='<li style="color:var(--muted);font-style:italic;font-size:1rem;padding:8px 0">No tasks this week</li>'; return;
   }
   el.innerHTML=week.map(t=>{
-    const i=todos.indexOf(t);
-    const dow=new Date(t.date).toLocaleDateString([],{weekday:'short'});
-    return `<li class="${t.done?'done':''}">
-      <input type="checkbox" ${t.done?'checked':''} onchange="toggleTodo(${i})">
-      <span class="todo-text">${t.text}</span>
+    const done = t.title.startsWith('✓ ');
+    const text = done ? t.title.slice(2) : t.title;
+    const dow  = t.start.toLocaleDateString([],{weekday:'short'});
+    return `<li class="${done?'done':''}">
+      <span class="todo-text">${text}</span>
       <span class="todo-day-badge">${dow}</span>
-      <span onclick="deleteTodo(${i})" style="cursor:pointer;color:var(--red);font-size:0.8rem;padding-left:4px">✕</span>
     </li>`;
   }).join('');
 }
-function addTodo() {
-  const inp=document.getElementById('todo-input'), text=inp.value.trim();
-  if (!text) return;
-  const todo={ text, done:false, date:new Date().toISOString(), id:Date.now() };
-  todos.push(todo); saveTodos(); inp.value='';
-  renderTodos(); renderWeekly(); pushTodoToCalendar(todo);
-}
-function toggleTodo(i) { todos[i].done=!todos[i].done; saveTodos(); renderTodos(); renderWeekly(); }
-function deleteTodo(i) { todos.splice(i,1); saveTodos(); renderTodos(); renderWeekly(); }
 
-// ── Bootstrap ─────────────────────────────────────────────
 (async function init() {
-  // Show setup screen on first visit (no credentials saved yet)
   if (!localStorage.getItem('cfg_g_id')) openSetup();
   await handleCallback();
   updateAuthUI();
